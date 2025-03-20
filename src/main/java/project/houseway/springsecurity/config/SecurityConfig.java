@@ -50,7 +50,7 @@ public class SecurityConfig {
         UserDetails admin = User.withDefaultPasswordEncoder()
                 .username("admin")
                 .password("password")
-                .roles("ADMIN")
+                .roles("ADMIN", "USER")
                 .build();
         
         return new InMemoryUserDetailsManager(user, admin);//계정 2개를 메모리에 저장
