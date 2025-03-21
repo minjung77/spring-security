@@ -1,5 +1,6 @@
 package project.houseway.springsecurity.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,13 +19,17 @@ import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final UserDetailsService userDetailService;
 
     // SecurityFilterChain : 스프링 시큐리티에서 적용된 보안규칙들을 필터로 구현해 둔 것
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()//CSRF 필터를 끔
+                    .userDetailsService(userDetailService)
                     .authorizeRequests()//url 기반 인가 설정
                     .antMatchers("/user/**").hasRole("USER")// user 권한 사용자만 접근
                     .antMatchers("/admin/**").hasRole("ADMIN")
@@ -32,11 +37,17 @@ public class SecurityConfig {
                     .antMatchers("/**").permitAll()// 인증/인가 여부와 상관없이 접근 가능
                     .and()
                 .formLogin()
+                    .loginProcessingUrl("/api/login")//로그인 처리 url
+                    .usernameParameter("userid") //아이디 매개변수 지정
+                    .passwordParameter("passwd") //비밀번호 매개변수 지정
+                    .defaultSuccessUrl("/")//로그인 성공 시 리다이텍트 url
+                    .failureUrl("/login?error=true")//로그인 실패시 리다이렉트 url
+                    .permitAll()
                     .and()
-                .logout()
+                .logout()// 로그아웃 설정
                     .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                     .logoutSuccessUrl("/")// 로그아웃 성공 후 리다이렉트될 url
-                    .invalidateHttpSession(true)//세션 무효화
+                    .invalidateHttpSession(true)// 세션 무효화
                     .deleteCookies("JSESSIONED")//JSESSIONID 쿠키 삭제
                     .permitAll();
         return http.build();
@@ -45,22 +56,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {// 비밀번호 암호화에 사용할 인코더
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user = User.builder()
-                .username("user")
-                .password(passwordEncoder.encode("password"))
-                .roles("USER")
-                .build();
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("password"))
-//                .roles("ADMIN", "USER")
-                .roles("ADMIN")// admin 권한 가짐
-                .build();
-        
-        return new InMemoryUserDetailsManager(user, admin);//계정 2개를 메모리에 저장
     }
 }
