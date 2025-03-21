@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users2")
+@Table(name = "users3")
 @Data @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,6 +27,9 @@ public class User {
     private String name;
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
+    private String role;
 
     @CreationTimestamp//Timestamp와 동일한 효과
     private LocalDateTime regdate;
