@@ -27,7 +27,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + validaty);
 
-        return Jwts.builder().setSubject(username).setIssuedAt(now).setExpiration(expiryDate).signWith(SignatureAlgorithm.ES256, secretKey).compact();
+        return Jwts.builder().setSubject(username).setIssuedAt(now).setExpiration(expiryDate).signWith(SignatureAlgorithm.HS256, secretKey).compact();
     }
     
     //주어진 JWT 가 유효한지, 토큰의 소유자가 맞는지 확인
