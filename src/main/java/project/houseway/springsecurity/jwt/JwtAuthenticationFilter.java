@@ -66,6 +66,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         //3. 인정정보 확인 및 검증
         // 요청 정보에 대해 아직 아무런 인증이 되지 않았다면 (중복인증 방지)
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            log.info(">> JwtAuthenticationFilter - loadUserByUsername 호출");
+
             //추출된 username을 이용해서 사용자 정보를 디비에서 조회
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
